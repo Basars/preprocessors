@@ -19,7 +19,7 @@ optional arguments:
   --mode {inspectors,segments}
 ```
 
-### Dataset Directory Structure
+### Dataset Hierarchy
 ```
 Dataset:
 - {LABEL_DIR}
