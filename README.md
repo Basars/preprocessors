@@ -7,7 +7,10 @@ Preprocessors to remove DICOM masks and generate segmentations.
 usage: main.py [-h] --dcm-dir DCM_DIR 
                     --label-dir LABEL_DIR 
                     --target-dir TARGET_DIR 
-                    --mode {inspector,segments}
+                    --mode {inspectors,masking,roi} 
+                    [--jobs JOBS]
+
+This is a preprocessor to remote DICOM masks and generate segmentations and its inspectors.
 
 optional arguments:
   -h, --help            show this help message and exit
@@ -16,7 +19,8 @@ optional arguments:
                         The JSON labels root directory
   --target-dir TARGET_DIR
                         The destination root directory for outputs
-  --mode {inspectors,segments}
+  --mode {inspectors,masking,roi}
+  --jobs JOBS           Number of workers
 ```
 
 ### Dataset Hierarchy
