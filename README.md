@@ -10,7 +10,7 @@ usage: main.py [-h] --dcm-dir DCM_DIR
                     --mode {inspectors,masking,roi} 
                     [--jobs JOBS]
 
-This is a preprocessor to remote DICOM masks and generate segmentations and its inspectors.
+This is a preprocessor to remove DICOM masks and generate segmentations and its inspectors.
 
 optional arguments:
   -h, --help            show this help message and exit

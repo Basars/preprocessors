@@ -11,7 +11,7 @@ modes = {
 
 def parse_arguments():
     parser = argparse.ArgumentParser(
-        description='This is a preprocessor to remote DICOM masks and generate segmentations and its inspectors.'
+        description='This is a preprocessor to remove DICOM masks and generate segmentations and its inspectors.'
     )
 
     parser.add_argument('--dcm-dir',
