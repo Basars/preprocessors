@@ -5,7 +5,7 @@ import pydicom as dcm
 import numpy as np
 
 
-def create_segment_mask(dicom_filepath, label_filepath):
+def create_segment_mask(dicom_filepath, label_filepath, remove_noise_intersection=False):
     dcm_file = dcm.dcmread(dicom_filepath)
     dcm_image = dcm_file.pixel_array
 
@@ -20,10 +20,11 @@ def create_segment_mask(dicom_filepath, label_filepath):
         polygons = np.array(annotations[i]['polygon'], dtype=np.int32)
         cv2.fillPoly(mask, [polygons], (255, 255, 255))
 
-    combined, segmentation = remove_mask_noise(dcm_image, mask)
+    noise_eliminated, segmentation = remove_mask_noise(dcm_image, mask)
+    combined = noise_eliminated.copy()
     combined[segmentation > 0] = 255
-    mask[(segmentation == 0) & (mask > 0)] = 127
-    return dcm_image, mask, combined
+    mask[(segmentation == 0) & (mask > 0)] = 0 if remove_noise_intersection else 127
+    return dcm_image, mask, combined, noise_eliminated
 
 
 def remove_mask_noise(rgb_img, segmentation):

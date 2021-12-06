@@ -12,15 +12,17 @@ class Inspector(Mode):
 
     @staticmethod
     def save_inspector(filename, segment_result, dst_filepath):
-        fig = plt.figure(figsize=(12, 6))
+        fig = plt.figure(figsize=(14, 6))
         exclusive = []
         index = 0
+        titles = ['original', 'mask', 'overlay', 'noise eliminated']
         for i in range(len(segment_result)):
             if i in exclusive:
                 continue
             index += 1
             img = segment_result[i]
             ax = fig.add_subplot(1, len(segment_result) - len(exclusive), index)
+            ax.set_title(titles[i])
             ax.set_xticks([])
             ax.set_yticks([])
             ax.imshow(img)
