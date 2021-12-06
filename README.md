@@ -2,6 +2,11 @@
 
 Preprocessors to remove DICOM masks and generate segmentations.
 
+### Prepare Dependencies
+```
+pip install opencv-python pydicom matplotlib
+```
+
 ### Command Usage
 ```
 usage: main.py [-h] --dcm-dir DCM_DIR 
