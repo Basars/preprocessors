@@ -1,6 +1,7 @@
 import os
 import cv2
 import json
+import argparse
 
 import pydicom as dcm
 import matplotlib.pyplot as plt
@@ -17,8 +18,6 @@ def create_segment_mask(dicom_filepath, label_filepath):
     mask = np.zeros(dcm_image.shape, dtype=np.uint8)
     annotations = label['image']['annotations']
     n_annotations = len(annotations)
-    if n_annotations == 0:
-        return None
 
     for i in range(n_annotations):
         polygons = np.array(annotations[i]['polygon'], dtype=np.int32)
@@ -120,7 +119,7 @@ def segment_dataset_inspector_pair(dcm_dir, label_dir, dst_dir, verbose=2):
     return success, not_existed, empty_annotations
 
 
-def create_dataset_inspector(root_dcm_dir, root_label_dir, root_dst_dir):
+def create_dataset_inspector(root_dcm_dir, root_label_dir, root_dst_dir, mode):
     dcm_subdirs = sorted([subdir
                           for subdir in os.listdir(root_dcm_dir)
                           if os.path.isdir(os.path.join(root_dcm_dir, subdir))])
@@ -149,3 +148,33 @@ def create_dataset_inspector(root_dcm_dir, root_label_dir, root_dst_dir):
             f"However, {not_existed} files are not matched each other, "
             f"{empty_annotations} files does not contains proper annotations"
         )
+
+
+def parse_arguments():
+    parser = argparse.ArgumentParser(
+        description='This is a preprocessor to remote DICOM masks and generate segmentations and its inspectors.'
+    )
+
+    parser.add_argument('--dcm-dir',
+                        required=True,
+                        help='The DICOM root directory')
+    parser.add_argument('--label-dir',
+                        required=True,
+                        help='The JSON labels root directory')
+    parser.add_argument('--target-dir',
+                        required=True,
+                        help='The destination root directory for outputs')
+    parser.add_argument('--mode',
+                        required=True,
+                        choices=['inspectors', 'segments'],
+                        default='inspectors')
+
+    args = parser.parse_args()
+    return args.dcm_dir, args.label_dir, args.target_dir, args.mode
+
+
+if __name__ == '__main__':
+    print()
+    dcm_dirpath, label_dirpath, target_dirpath, mode = parse_arguments()
+    create_dataset_inspector(dcm_dirpath, label_dirpath, target_dirpath, mode)
+    print('Jobs finished.')
