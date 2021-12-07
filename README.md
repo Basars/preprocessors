@@ -12,10 +12,11 @@ pip install opencv-python pydicom matplotlib
 usage: main.py [-h] --dcm-dir DCM_DIR 
                     --label-dir LABEL_DIR 
                     --target-dir TARGET_DIR 
-                    --mode {inspectors,masking,roi} 
+                    --mode {inspector,mask,roi}
                     [--jobs JOBS]
 
-This is a preprocessor to remove DICOM masks and generate segmentations and its inspectors.
+This is a preprocessor to remove DICOM masks and generate segmentations and
+its inspectors, masks and ROIs.
 
 optional arguments:
   -h, --help            show this help message and exit
@@ -24,7 +25,12 @@ optional arguments:
                         The JSON labels root directory
   --target-dir TARGET_DIR
                         The destination root directory for outputs
-  --mode {inspectors,masking,roi}
+  --mode {inspector,mask,roi}
+                        inspector    Generate four-in-one images to compare masks, overlay 
+                                     and noise-eliminated with original image
+                        masks        Generate binary masks that will be used as Dataset for segmentation models
+                        roi          Generate region-of-interest images that will be used 
+                                     as Dataset for classification model                        
   --jobs JOBS           Number of workers
 ```
 

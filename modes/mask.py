@@ -5,10 +5,10 @@ from .mode import Mode
 from preprocessors import create_segment_mask
 
 
-class Masking(Mode):
+class Mask(Mode):
 
     def __init__(self, root_dcm_dir, root_label_dir, root_dst_dir):
-        super(Masking, self).__init__('Masking', root_dcm_dir, root_label_dir, root_dst_dir)
+        super(Mask, self).__init__('Mask', root_dcm_dir, root_label_dir, root_dst_dir)
 
     def run(self, dst_dir, filename, dcm_filepath, label_filepath):
         dst_filepath = os.path.join(dst_dir, '{}.png'.format(filename))

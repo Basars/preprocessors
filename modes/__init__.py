@@ -1,3 +1,3 @@
 from .inspector import Inspector
-from .masking import Masking
+from .mask import Mask
 from .roi import ROI

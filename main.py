@@ -1,16 +1,20 @@
 import argparse
-from modes import Inspector, Masking, ROI
+import textwrap
+
+from modes import Inspector, Mask, ROI
 
 modes = {
-    'inspectors': Inspector,
-    'masking': Masking,
+    'inspector': Inspector,
+    'mask': Mask,
     'roi': ROI
 }
 
 
 def parse_arguments():
     parser = argparse.ArgumentParser(
-        description='This is a preprocessor to remove DICOM masks and generate segmentations and its inspectors.'
+        description='This is a preprocessor to remove DICOM masks '
+                    'and generate segmentations and its inspectors, masks and ROIs.',
+        formatter_class=argparse.RawTextHelpFormatter
     )
 
     parser.add_argument('--dcm-dir',
@@ -25,7 +29,14 @@ def parse_arguments():
     parser.add_argument('--mode',
                         required=True,
                         choices=list(modes.keys()),
-                        default=list(modes.keys())[0])
+                        default=list(modes.keys())[0],
+                        help=textwrap.dedent('''\
+                        inspector    Generate four-in-one images to compare masks, overlay 
+                                     and noise-eliminated with original image
+                        masks        Generate binary masks that will be used as Dataset for segmentation models
+                        roi          Generate region-of-interest images that will be used 
+                                     as Dataset for classification model\
+                        '''))
     parser.add_argument('--jobs',
                         default=-1,
                         help='Number of workers')
