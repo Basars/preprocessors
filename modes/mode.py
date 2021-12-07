@@ -86,6 +86,7 @@ class Mode:
         else:
             n_threads = jobs
 
+        print('Current mode: {}'.format(self.name))
         print('Gathering DICOM and labels sorted directories...')
         dcm_subdirs = sorted([subdir
                               for subdir in os.listdir(self.root_dcm_dir)
