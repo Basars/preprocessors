@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 
 from .mode import Mode
 from preprocessors import create_segment_mask
+from statistic import Statistic
 
 
 class Inspector(Mode):
@@ -32,13 +33,12 @@ class Inspector(Mode):
         fig.savefig(dst_filepath, transparent=False)
         plt.close(fig)
 
-    def run(self, statistic, dst_dir, filename, dcm_filepath, label_filepath):
+    def run(self, dst_dir, filename, dcm_filepath, label_filepath):
         dst_filepath = os.path.join(dst_dir, '{}_inspector.jpg'.format(filename))
 
         segmentation = create_segment_mask(dcm_filepath, label_filepath)
         if segmentation is None:
-            statistic.increase('empty_annotations', 1)
             print(f"Annotations are not existed in '{label_filepath}'.")
-            return False
+            return Statistic.from_key_value('empty_annotations', 1)
         Inspector.save_inspector(filename, segmentation, dst_filepath)
-        return True
+        return None

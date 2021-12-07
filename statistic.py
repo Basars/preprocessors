@@ -16,3 +16,9 @@ class Statistic:
             self._container[k] = self._container[k] + v
         else:
             self._container[k] = v
+
+    @staticmethod
+    def from_key_value(k, v):
+        statistic = Statistic()
+        statistic.increase(k, v)
+        return statistic

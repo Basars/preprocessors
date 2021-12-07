@@ -30,7 +30,7 @@ class Mode:
     def root_dst_dir(self):
         return self._root_dst_dir
 
-    def run(self, statistic: Statistic, dst_dir, filename, dcm_filepath, label_filepath) -> bool:
+    def run(self, dst_dir, filename, dcm_filepath, label_filepath) -> Statistic or None:
         raise NotImplementedError('mode#run is not implemented.')
 
     def run_segmentation_pair(self, dcm_dir, label_dir, dst_dir):
@@ -42,6 +42,7 @@ class Mode:
         files = dcm_files if len(dcm_files) > len(label_files) else label_files
         print(f"Starting to generate {len(files)} segmentation inspector files...")
         statistic = Statistic()
+        errors = []
         for filename in files:
             filename = filename.split('.')[0]
 
@@ -58,11 +59,13 @@ class Mode:
                     print(f"'{json_filepath} is not existed despite its DICOM file is existed.")
                 continue
 
-            if not self.run(statistic, dst_dir, filename, dcm_filepath, json_filepath):
+            error = self.run(dst_dir, filename, dcm_filepath, json_filepath)
+            if error is not None:
+                errors.append(error)
                 continue
 
             statistic.increase('success', 1)
-        return statistic
+        return Statistic(statistic, *errors)
 
     def run_job(self, chunk: list):
         statistics = []
