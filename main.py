@@ -1,10 +1,10 @@
 import argparse
-from modes import Inspector, Masking
+from modes import Inspector, Masking, ROI
 
 modes = {
     'inspectors': Inspector,
     'masking': Masking,
-    'roi': None
+    'roi': ROI
 }
 
 

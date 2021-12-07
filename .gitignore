@@ -146,6 +146,7 @@ pip-selfcheck.json
 dcms
 inspectors
 masks
+rois
 labels
 *.ipynb
 
