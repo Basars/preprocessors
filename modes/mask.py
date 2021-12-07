@@ -13,6 +13,6 @@ class Mask(Mode):
     def run(self, dst_dir, filename, dcm_filepath, label_filepath):
         dst_filepath = os.path.join(dst_dir, '{}.png'.format(filename))
 
-        _, mask, _, _ = create_segment_mask(dcm_filepath, label_filepath)
+        _, mask, _, _ = create_segment_mask(dcm_filepath, label_filepath, remove_noise_intersection=True)
         cv2.imwrite(dst_filepath, mask)
         return None
