@@ -28,7 +28,7 @@ optional arguments:
   --mode {inspector,mask,roi}
                         inspector    Generate four-in-one images to compare masks, overlay 
                                      and noise-eliminated with original image
-                        masks        Generate binary masks that will be used as Dataset for segmentation models
+                        mask         Generate binary masks that will be used as Dataset for segmentation models
                         roi          Generate region-of-interest images that will be used 
                                      as Dataset for classification model                        
   --jobs JOBS           Number of workers
