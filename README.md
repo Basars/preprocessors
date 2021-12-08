@@ -13,6 +13,7 @@ usage: main.py [-h] --dcm-dir DCM_DIR
                     --label-dir LABEL_DIR 
                     --target-dir TARGET_DIR 
                     --mode {inspector,mask,roi}
+                    [--new-shape NEW_SHAPE]
                     [--jobs JOBS]
 
 This is a preprocessor to remove DICOM masks and generate segmentations and
@@ -32,6 +33,8 @@ optional arguments:
                                      for segmentation models
                         roi          Generate region-of-interest images that will be used 
                                      as Dataset for classification models
+  --new-shape NEW_SHAPE
+                        WxH. Resize the output image with desired width and height
   --jobs JOBS           Number of workers
 ```
 

@@ -1,6 +1,8 @@
 import os
+import cv2
 import time
 import multiprocessing
+import numpy as np
 
 from statistic import Statistic
 from concurrent.futures import ThreadPoolExecutor
@@ -8,11 +10,12 @@ from concurrent.futures import ThreadPoolExecutor
 
 class Mode:
 
-    def __init__(self, name, root_dcm_dir, root_label_dir, root_dst_dir):
+    def __init__(self, name, root_dcm_dir, root_label_dir, root_dst_dir, pipes):
         self._name = name
         self._root_dcm_dir = root_dcm_dir
         self._root_label_dir = root_label_dir
         self._root_dst_dir = root_dst_dir
+        self._pipes = pipes
 
     @property
     def name(self):
@@ -29,6 +32,23 @@ class Mode:
     @property
     def root_dst_dir(self):
         return self._root_dst_dir
+
+    def finish_and_save(self, target_filepath, image) -> Statistic or None:
+        statistics = []
+        for pipe in self._pipes:
+            ret = pipe.apply(image)
+            if isinstance(ret, Statistic):
+                statistics.append(ret)
+                break
+            elif isinstance(ret, np.ndarray):
+                image = ret
+            else:
+                statistics.append(Statistic.from_key_value(f'invalid_pipe_result ({pipe.name})', 1))
+                break
+        if len(statistics) > 0:
+            return Statistic(*statistics)
+        cv2.imwrite(target_filepath, image)
+        return None
 
     def run(self, dst_dir, filename, dcm_filepath, label_filepath) -> Statistic or None:
         raise NotImplementedError('mode#run is not implemented.')
