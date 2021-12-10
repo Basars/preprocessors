@@ -26,7 +26,7 @@ optional arguments:
                         The JSON labels root directory
   --target-dir TARGET_DIR
                         The destination root directory for outputs
-  --mode {inspector,mask,roi}
+  --mode {inspector,mask,roi,spreadsheet}
                         inspector    Generate four-in-one images to compare masks, overlay 
                                      and noise-eliminated with original image
                         mask         Generate binary masks that will be used as Dataset
