@@ -16,6 +16,7 @@ class Mode:
         self._root_label_dir = root_label_dir
         self._root_dst_dir = root_dst_dir
         self._pipes = pipes
+        self._make_patient_dir = True
 
     @property
     def name(self):
@@ -33,7 +34,10 @@ class Mode:
     def root_dst_dir(self):
         return self._root_dst_dir
 
-    def finish_and_save(self, target_filepath, image) -> Statistic or None:
+    def finish(self):
+        pass
+
+    def pipelines(self, target_filepath, image) -> Statistic or None:
         statistics = []
         for pipe in self._pipes:
             ret = pipe.apply(image)
@@ -54,7 +58,7 @@ class Mode:
         raise NotImplementedError('mode#run is not implemented.')
 
     def run_segmentation_pair(self, dcm_dir, label_dir, dst_dir):
-        if not os.path.exists(dst_dir):
+        if not os.path.exists(dst_dir) and self._make_patient_dir:
             os.makedirs(dst_dir, exist_ok=True)
         dcm_files = os.listdir(dcm_dir)
         label_files = os.listdir(label_dir)
@@ -140,6 +144,8 @@ class Mode:
         statistics = []
         for future in futures:
             statistics.append(future.result())
+
+        self.finish()
         print("All jobs have finished.")
         print(f"Total {(end_time - start_time):.2f} seconds have elapsed")
         statistic = Statistic(*statistics)
