@@ -2,13 +2,14 @@ import argparse
 import sys
 import textwrap
 
-from modes import Inspector, Mask, ROI
+from modes import Inspector, Mask, ROI, Spreadsheet
 from pipes import Resize
 
 modes = {
     'inspector': Inspector,
     'mask': Mask,
-    'roi': ROI
+    'roi': ROI,
+    'spreadsheet': Spreadsheet
 }
 
 
@@ -37,7 +38,9 @@ def parse_arguments():
                                      and noise-eliminated with original image
                         mask         Generate binary masks that will be used as Dataset for segmentation models
                         roi          Generate region-of-interest images that will be used 
-                                     as Dataset for classification model\
+                                     as Dataset for classification model
+                        spreadsheet  Generate CSV files that contains encrypted
+                                     patients identifiers and its file name
                         '''))
     parser.add_argument('--new-shape',
                         help='WxH. Resize the output image with desired width and height')

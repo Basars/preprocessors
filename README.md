@@ -12,7 +12,7 @@ pip install opencv-python pydicom matplotlib
 usage: main.py [-h] --dcm-dir DCM_DIR 
                     --label-dir LABEL_DIR 
                     --target-dir TARGET_DIR 
-                    --mode {inspector,mask,roi}
+                    --mode {inspector,mask,roi,spreadsheet}
                     [--new-shape NEW_SHAPE]
                     [--jobs JOBS]
 
@@ -32,7 +32,9 @@ optional arguments:
                         mask         Generate binary masks that will be used as Dataset
                                      for segmentation models
                         roi          Generate region-of-interest images that will be used 
-                                     as Dataset for classification models
+                                     as Dataset for classification model
+                        spreadsheet  Generate CSV files that contains encrypted
+                                     patients identifiers and its file name
   --new-shape NEW_SHAPE
                         WxH. Resize the output image with desired width and height
   --jobs JOBS           Number of workers

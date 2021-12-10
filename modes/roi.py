@@ -16,4 +16,4 @@ class ROI(Mode):
         dcm_image, mask, _, _ = create_segment_mask(dcm_filepath, label_filepath, remove_noise_intersection=True)
         image = cv2.bitwise_and(dcm_image, mask)
         image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
-        return self.finish_and_save(dst_filepath, image)
+        return self.pipelines(dst_filepath, image)

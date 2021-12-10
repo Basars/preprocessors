@@ -147,6 +147,7 @@ dcms
 inspectors
 masks
 rois
+spreadsheets
 labels
 *.ipynb
 

@@ -13,4 +13,4 @@ class Mask(Mode):
         dst_filepath = os.path.join(dst_dir, '{}.png'.format(filename))
 
         _, mask, _, _ = create_segment_mask(dcm_filepath, label_filepath, remove_noise_intersection=True)
-        return self.finish_and_save(dst_filepath, mask)
+        return self.pipelines(dst_filepath, mask)
