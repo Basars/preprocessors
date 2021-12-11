@@ -1,3 +1,4 @@
+import json
 import os
 import cv2
 import time
@@ -5,6 +6,7 @@ import multiprocessing
 import numpy as np
 
 from statistic import Statistic
+from filters import PhaseFilter
 from concurrent.futures import ThreadPoolExecutor
 
 
@@ -17,6 +19,7 @@ class Mode:
         self._root_dst_dir = root_dst_dir
         self._pipes = pipes
         self._make_patient_dir = True
+        self._filters = [PhaseFilter()]
 
     @property
     def name(self):
@@ -82,6 +85,18 @@ class Mode:
                 else:
                     print(f"'{json_filepath} is not existed despite its DICOM file is existed.")
                 continue
+
+            with open(json_filepath, 'r', encoding='euc-kr') as f:
+                label_json = json.load(f)
+
+            for f in self._filters:
+                error = f.apply(label_json)
+                if error is not None:
+                    errors.append(error)
+                    break
+
+            if len(errors) > 0:
+                break
 
             error = self.run(dst_dir, filename, dcm_filepath, json_filepath)
             if error is not None:
