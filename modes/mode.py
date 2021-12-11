@@ -63,8 +63,8 @@ class Mode:
     def run_segmentation_pair(self, dcm_dir, label_dir, dst_dir):
         if not os.path.exists(dst_dir) and self._make_patient_dir:
             os.makedirs(dst_dir, exist_ok=True)
-        dcm_files = os.listdir(dcm_dir)
-        label_files = os.listdir(label_dir)
+        dcm_files = [f for f in os.listdir(dcm_dir) if not os.path.isdir(f) and f.lower().endswith('.dcm')]
+        label_files = [f for f in os.listdir(label_dir) if not os.path.isdir(f) and f.lower().endswith('.json')]
 
         files = dcm_files if len(dcm_files) > len(label_files) else label_files
         print(f"Starting to generate {len(files)} segmentation inspector files...")
@@ -106,15 +106,28 @@ class Mode:
             statistic.increase('success', 1)
         return Statistic(statistic, *errors)
 
+    def find_directory_hierarchy(self, root_dir):
+        dirs = [f for f in os.listdir(root_dir) if os.path.isdir(os.path.join(root_dir, f))]
+        for dirname in dirs:
+            dirpath = os.path.join(root_dir, dirname)
+            dirs.extend(self.find_directory_hierarchy(dirpath))
+        return dirs
+
     def run_job(self, chunk: list):
         statistics = []
         for dcm_subdir, label_subdir in chunk:
             assert dcm_subdir == label_subdir
 
-            dcm_dir = os.path.join(self.root_dcm_dir, dcm_subdir, 'ENDO')
-            label_dir = os.path.join(self.root_label_dir, label_subdir, 'ENDO')
-            dst_dir = os.path.join(self.root_dst_dir, dcm_subdir)
-            statistics.append(self.run_segmentation_pair(dcm_dir, label_dir, dst_dir))
+            dcm_dirs = self.find_directory_hierarchy(os.path.join(self.root_dcm_dir, dcm_subdir))
+            label_dirs = self.find_directory_hierarchy(os.path.join(self.root_label_dir, label_subdir))
+            assert len(dcm_dirs) == len(label_dirs)
+
+            for dcm_dir, label_dir in zip(dcm_dirs, label_dirs):
+                dst_dir = os.path.join(self.root_dst_dir, dcm_subdir, dcm_dir)
+
+                dcm_dir = os.path.join(self.root_dcm_dir, dcm_subdir, dcm_dir)
+                label_dir = os.path.join(self.root_label_dir, label_subdir, label_dir)
+                statistics.append(self.run_segmentation_pair(dcm_dir, label_dir, dst_dir))
         return Statistic(*statistics)
 
     def parse_and_preprocess_dirs(self, jobs=-1):
