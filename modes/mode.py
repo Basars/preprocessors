@@ -63,8 +63,10 @@ class Mode:
     def run_segmentation_pair(self, dcm_dir, label_dir, dst_dir):
         if not os.path.exists(dst_dir) and self._make_patient_dir:
             os.makedirs(dst_dir, exist_ok=True)
-        dcm_files = [f for f in os.listdir(dcm_dir) if not os.path.isdir(f) and f.lower().endswith('.dcm')]
-        label_files = [f for f in os.listdir(label_dir) if not os.path.isdir(f) and f.lower().endswith('.json')]
+        dcm_files = [f for f in os.listdir(dcm_dir)
+                     if not os.path.isdir(f) and f.lower().endswith('.dcm') and not f.startswith('.')]
+        label_files = [f for f in os.listdir(label_dir)
+                       if not os.path.isdir(f) and f.lower().endswith('.json') and not f.startswith('.')]
 
         files = dcm_files if len(dcm_files) > len(label_files) else label_files
         print(f"Starting to generate {len(files)} segmentation inspector files...")
