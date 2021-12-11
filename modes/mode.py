@@ -114,6 +114,7 @@ class Mode:
             dcm_dir = os.path.join(self.root_dcm_dir, dcm_subdir, 'ENDO')
             label_dir = os.path.join(self.root_label_dir, label_subdir, 'ENDO')
             if not os.path.exists(dcm_dir) or not os.path.exists(label_dir):
+                print(f"'{dcm_dir}' does not contain endoscopic images")
                 statistics.append(Statistic.from_key_value('no_endoscopic_dir', 1))
                 continue
             dst_dir = os.path.join(self.root_dst_dir, dcm_subdir)
