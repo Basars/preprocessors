@@ -110,7 +110,12 @@ class Mode:
         dirs = [f for f in os.listdir(root_dir) if os.path.isdir(os.path.join(root_dir, f))]
         for dirname in dirs:
             dirpath = os.path.join(root_dir, dirname)
-            dirs.extend(self.find_directory_hierarchy(dirpath))
+            if len(os.listdir(dirpath)) == 0:
+                dirs.remove(dirname)
+
+            subdirs = self.find_directory_hierarchy(dirpath)
+            for subdir in subdirs:
+                dirs.append(os.path.join(dirname, subdir))
         return dirs
 
     def run_job(self, chunk: list):
