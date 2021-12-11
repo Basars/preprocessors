@@ -106,33 +106,18 @@ class Mode:
             statistic.increase('success', 1)
         return Statistic(statistic, *errors)
 
-    def find_directory_hierarchy(self, root_dir):
-        dirs = [f for f in os.listdir(root_dir) if os.path.isdir(os.path.join(root_dir, f))]
-        for dirname in dirs:
-            dirpath = os.path.join(root_dir, dirname)
-            if len(os.listdir(dirpath)) == 0:
-                dirs.remove(dirname)
-
-            subdirs = self.find_directory_hierarchy(dirpath)
-            for subdir in subdirs:
-                dirs.append(os.path.join(dirname, subdir))
-        return dirs
-
     def run_job(self, chunk: list):
         statistics = []
         for dcm_subdir, label_subdir in chunk:
             assert dcm_subdir == label_subdir
 
-            dcm_dirs = self.find_directory_hierarchy(os.path.join(self.root_dcm_dir, dcm_subdir))
-            label_dirs = self.find_directory_hierarchy(os.path.join(self.root_label_dir, label_subdir))
-            assert len(dcm_dirs) == len(label_dirs)
-
-            for dcm_dir, label_dir in zip(dcm_dirs, label_dirs):
-                dst_dir = os.path.join(self.root_dst_dir, dcm_subdir, dcm_dir)
-
-                dcm_dir = os.path.join(self.root_dcm_dir, dcm_subdir, dcm_dir)
-                label_dir = os.path.join(self.root_label_dir, label_subdir, label_dir)
-                statistics.append(self.run_segmentation_pair(dcm_dir, label_dir, dst_dir))
+            dcm_dir = os.path.join(self.root_dcm_dir, dcm_subdir, 'ENDO')
+            label_dir = os.path.join(self.root_label_dir, label_subdir, 'ENDO')
+            if not os.path.exists(dcm_dir) or not os.path.exists(label_dir):
+                statistics.append(Statistic.from_key_value('no_endoscopic_dir', 1))
+                continue
+            dst_dir = os.path.join(self.root_dst_dir, dcm_subdir)
+            statistics.append(self.run_segmentation_pair(dcm_dir, label_dir, dst_dir))
         return Statistic(*statistics)
 
     def parse_and_preprocess_dirs(self, jobs=-1):
