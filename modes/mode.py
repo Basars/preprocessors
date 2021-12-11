@@ -90,7 +90,7 @@ class Mode:
                 label_json = json.load(f)
 
             for f in self._filters:
-                error = f.apply(label_json)
+                error = f.apply(json_filepath, label_json)
                 if error is not None:
                     errors.append(error)
                     break
