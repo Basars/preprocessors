@@ -71,6 +71,7 @@ class Mode:
         statistic = Statistic()
         errors = []
         for filename in files:
+            original_filename = filename
             filename = filename.split('.')[0]
 
             dcm_filepath = os.path.join(dcm_dir, '{}.dcm'.format(filename))
@@ -81,9 +82,11 @@ class Mode:
             if not dcm_existence or not json_existence:
                 statistic.increase('not_existed', 1)
                 if not dcm_existence:
-                    print(f"'{dcm_filepath}' is not existed despite its label is existed.")
+                    print(f"'{dcm_filepath}' is not existed despite its label is existed. "
+                          f"The original filename was '{original_filename}'")
                 else:
-                    print(f"'{json_filepath} is not existed despite its DICOM file is existed.")
+                    print(f"'{json_filepath} is not existed despite its DICOM file is existed. "
+                          f"The original filename was '{original_filename}'")
                 continue
 
             with open(json_filepath, 'r', encoding='euc-kr') as f:
