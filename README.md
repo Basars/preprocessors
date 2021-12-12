@@ -4,7 +4,7 @@ Preprocessors to remove DICOM masks and generate segmentations.
 
 ### Prepare Dependencies
 ```
-pip install opencv-python pydicom matplotlib
+pip install opencv-python pydicom matplotlib pandas
 ```
 
 ### Command Usage
@@ -38,6 +38,21 @@ optional arguments:
   --new-shape NEW_SHAPE
                         WxH. Resize the output image with desired width and height
   --jobs JOBS           Number of workers
+```
+```
+usage: assign.py [-h] --csv-file CSV_FILE 
+                      --source-dirs SOURCE_DIRS
+                      --target-dir TARGET_DIR
+
+This is an assigner for assigning dataset validation job fairly.
+
+optional arguments:
+  -h, --help            show this help message and exit
+  --csv-file CSV_FILE   The assignees CSV file
+  --source-dirs SOURCE_DIRS
+                        dir1,dir2,dir3,..  The source directories to be assigned to
+  --target-dir TARGET_DIR
+                        The destination directory where the assigned directory will be located
 ```
 
 ### Dataset Hierarchy

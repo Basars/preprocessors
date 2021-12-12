@@ -149,7 +149,9 @@ masks
 rois
 spreadsheets
 labels
+assigned
 *.ipynb
+*.csv
 
 .idea
 
