@@ -10,7 +10,7 @@ class PhaseFilter(Filter):
     def __init__(self):
         super(PhaseFilter, self).__init__()
 
-    def apply(self, label_filepath, label_json) -> Statistic or None:
+    def apply(self, filename, label_filepath, label_json) -> Statistic or None:
         phase = int(label_json['image']['phase_id'])
         if PhaseFilter.MIN_PHASE < phase < PhaseFilter.MAX_PHASE:
             return None

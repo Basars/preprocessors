@@ -7,8 +7,8 @@ from preprocessors import create_segment_mask
 
 class ROI(Mode):
 
-    def __init__(self, root_dcm_dir, root_label_dir, root_dst_dir, pipes):
-        super(ROI, self).__init__('ROI', root_dcm_dir, root_label_dir, root_dst_dir, pipes)
+    def __init__(self, root_dcm_dir, root_label_dir, root_dst_dir, pipes, filters):
+        super(ROI, self).__init__('ROI', root_dcm_dir, root_label_dir, root_dst_dir, pipes, filters)
 
     def run(self, dst_dir, filename, dcm_filepath, label_filepath):
         dst_filepath = os.path.join(dst_dir, '{}.png'.format(filename))

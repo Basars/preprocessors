@@ -10,9 +10,11 @@ pip install opencv-python pydicom matplotlib pandas
 ### Command Usage
 ```
 usage: main.py [-h] --dcm-dir DCM_DIR 
-                    --label-dir LABEL_DIR 
-                    --target-dir TARGET_DIR 
+                    --label-dir LABEL_DIR
+                    --target-dir TARGET_DIR
                     --mode {inspector,mask,roi,spreadsheet}
+                    [--filterable-csv-file FILTERABLE_CSV_FILE]
+                    [--filterable-dataset-type {train,valid,test}]
                     [--new-shape NEW_SHAPE]
                     [--jobs JOBS]
 
@@ -35,6 +37,10 @@ optional arguments:
                                      as Dataset for classification model
                         spreadsheet  Generate CSV files that contains encrypted
                                      patients identifiers and its file name
+  --filterable-csv-file FILTERABLE_CSV_FILE
+                        The CSV file to be used for filtering broken datasets out
+  --filterable-dataset-type {train,valid,test}
+                        The type of dataset source directory for querying filterable CSV file
   --new-shape NEW_SHAPE
                         WxH. Resize the output image with desired width and height
   --jobs JOBS           Number of workers

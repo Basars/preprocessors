@@ -6,20 +6,19 @@ import multiprocessing
 import numpy as np
 
 from statistic import Statistic
-from filters import PhaseFilter
 from concurrent.futures import ThreadPoolExecutor
 
 
 class Mode:
 
-    def __init__(self, name, root_dcm_dir, root_label_dir, root_dst_dir, pipes):
+    def __init__(self, name, root_dcm_dir, root_label_dir, root_dst_dir, pipes, filters):
         self._name = name
         self._root_dcm_dir = root_dcm_dir
         self._root_label_dir = root_label_dir
         self._root_dst_dir = root_dst_dir
         self._pipes = pipes
         self._make_patient_dir = True
-        self._filters = [PhaseFilter()]
+        self._filters = filters
 
     @property
     def name(self):
@@ -95,13 +94,13 @@ class Mode:
                 label_json = json.load(f)
 
             for f in self._filters:
-                error = f.apply(json_filepath, label_json)
+                error = f.apply(filename, json_filepath, label_json)
                 if error is not None:
                     errors.append(error)
                     break
 
             if len(errors) > 0:
-                break
+                continue
 
             error = self.run(dst_dir, filename, dcm_filepath, json_filepath)
             if error is not None:

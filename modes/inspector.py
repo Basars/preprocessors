@@ -8,8 +8,8 @@ from statistic import Statistic
 
 class Inspector(Mode):
 
-    def __init__(self, root_dcm_dir, root_label_dir, root_dst_dir, _):
-        super(Inspector, self).__init__('Inspector', root_dcm_dir, root_label_dir, root_dst_dir, [])
+    def __init__(self, root_dcm_dir, root_label_dir, root_dst_dir, _, filters):
+        super(Inspector, self).__init__('Inspector', root_dcm_dir, root_label_dir, root_dst_dir, [], filters)
 
     @staticmethod
     def save_inspector(filename, segment_result, dst_filepath):

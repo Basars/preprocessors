@@ -4,6 +4,7 @@ import textwrap
 
 from modes import Inspector, Mask, ROI, Spreadsheet
 from pipes import Resize
+from filters import PhaseFilter, FilterableFilter
 
 modes = {
     'inspector': Inspector,
@@ -42,6 +43,11 @@ def parse_arguments():
                         spreadsheet  Generate CSV files that contains encrypted
                                      patients identifiers and its file name
                         '''))
+    parser.add_argument('--filterable-csv-file',
+                        help='The CSV file to be used for filtering broken datasets out')
+    parser.add_argument('--filterable-dataset-type',
+                        choices=['train', 'valid', 'test'],
+                        help='The type of dataset source directory for querying filterable CSV file')
     parser.add_argument('--new-shape',
                         help='WxH. Resize the output image with desired width and height')
     parser.add_argument('--jobs',
@@ -58,24 +64,41 @@ def parse_arguments():
     else:
         new_shape = None
 
-    return args.dcm_dir, args.label_dir, args.target_dir, args.mode, int(args.jobs), new_shape
+    filterable_csv_file = args.filterable_csv_file
+    filterable_dataset_type = args.filterable_dataset_type
+    if (filterable_csv_file is not None and filterable_dataset_type is None) or \
+       (filterable_csv_file is None and filterable_dataset_type is not None):
+        print('{}: error: --filterable-csv-file and --filterable-dataset-type'
+              ' arguments must be existed at the same time.')
+        sys.exit(1)
+
+    return args.dcm_dir, args.label_dir, args.target_dir, args.mode, int(args.jobs), new_shape, filterable_csv_file, filterable_dataset_type
 
 
 def main():
     print()
-    dcm_dirpath, label_dirpath, target_dirpath, mode_name, jobs, new_shape = parse_arguments()
+    dcm_dirpath, label_dirpath, target_dirpath, mode_name, jobs, new_shape, filterable_csv_file, filterable_dataset_type = parse_arguments()
     mode_type = modes[mode_name]
     if mode_type is None:
         print('Unrecognizable mode argument: {}'.format(mode_name))
         return
 
     pipes = []
+    filters = []
     if new_shape is not None:
         pipe = Resize((int(new_shape[1]), int(new_shape[0])))  # WxH -> HxW
-        pipe.inform()
         pipes.append(pipe)
 
-    mode = mode_type(dcm_dirpath, label_dirpath, target_dirpath, pipes)
+    if filterable_csv_file is not None and filterable_dataset_type is not None:
+        filters.append(FilterableFilter(filterable_csv_file, filterable_dataset_type))
+
+    for pipe in pipes:
+        pipe.inform()
+
+    # Filters
+    filters.append(PhaseFilter())
+
+    mode = mode_type(dcm_dirpath, label_dirpath, target_dirpath, pipes, filters)
     statistic = mode.parse_and_preprocess_dirs(jobs)
     print("Job statistics:")
     for name, count in statistic.container.items():

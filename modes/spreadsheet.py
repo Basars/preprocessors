@@ -6,8 +6,8 @@ from statistic import Statistic
 
 class Spreadsheet(Mode):
 
-    def __init__(self, root_dcm_dir, root_label_dir, root_dst_dir, _):
-        super(Spreadsheet, self).__init__('Spreadsheet', root_dcm_dir, root_label_dir, root_dst_dir, [])
+    def __init__(self, root_dcm_dir, root_label_dir, root_dst_dir, _, filters):
+        super(Spreadsheet, self).__init__('Spreadsheet', root_dcm_dir, root_label_dir, root_dst_dir, [], filters)
 
         self._make_patient_dir = False
 
