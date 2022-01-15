@@ -76,3 +76,24 @@ Dataset:
         - ENDO
             - *.dcm
 ```
+
+### CSV Formats
+#### Filterable CSV File
+```csv
+filterable-dataset-type,patient_id,image_id,assignee,issue
+
+train,00000001,00000001_0001,John,TRUE
+valid,00000002,00000002_0001,James,FALSE
+test,00000003,00000003_0001,Alice,FALSE
+```
+`TRUE` means the row have an issue, and the image will be truncated in the result.
+
+#### Assignees CSV File
+```csv
+John,James,Alice
+,,
+00000001,00000002,00000003
+00000004,00000005,
+,00000006,
+```
+Proper assignees CSV file is required to separate the dataset fairly.
