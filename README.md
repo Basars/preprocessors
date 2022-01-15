@@ -16,6 +16,7 @@ usage: main.py [-h] --dcm-dir DCM_DIR
                     [--filterable-csv-file FILTERABLE_CSV_FILE]
                     [--filterable-dataset-type {train,valid,test}]
                     [--new-shape NEW_SHAPE]
+                    [--crop-image CROP_IMAGE]
                     [--jobs JOBS]
 
 This is a preprocessor to remove DICOM masks and generate segmentations and
@@ -42,7 +43,9 @@ optional arguments:
   --filterable-dataset-type {train,valid,test}
                         The type of dataset source directory for querying filterable CSV file
   --new-shape NEW_SHAPE
-                        WxH. Resize the output image with desired width and height
+                        WxH. Resize the output image with desired width and height - e.g.) 224x224
+  --crop-image CROP_IMAGE
+                        X:Y,W:H. Crop the output image to desired rectangle - e.g.) 90:0,480:480
   --jobs JOBS           Number of workers
 ```
 ```

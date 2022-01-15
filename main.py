@@ -3,7 +3,7 @@ import sys
 import textwrap
 
 from modes import Inspector, Mask, ROI, Spreadsheet
-from pipes import Resize
+from pipes import Resize, Crop
 from filters import PhaseFilter, FilterableFilter
 
 modes = {
@@ -49,7 +49,9 @@ def parse_arguments():
                         choices=['train', 'valid', 'test'],
                         help='The type of dataset source directory for querying filterable CSV file')
     parser.add_argument('--new-shape',
-                        help='WxH. Resize the output image with desired width and height')
+                        help='WxH. Resize the output image with desired width and height - e.g.) 224x224')
+    parser.add_argument('--crop-image',
+                        help='X:Y,W:H. Crop the output image to desired rectangle - e.g.) 90:0,480:480')
     parser.add_argument('--jobs',
                         default=-1,
                         help='Number of workers')
@@ -58,11 +60,27 @@ def parse_arguments():
 
     if args.new_shape is not None:
         if 'x' not in args.new_shape:
-            print('{}: error: the following argument --new-shape requires follow WxH format'.format(__file__))
+            print('{}: error: the following argument --new-shape requires to follow WxH format'.format(__file__))
             sys.exit(1)
         new_shape = args.new_shape.split('x')
     else:
         new_shape = None
+
+    if args.crop_image is not None:
+        pairs = args.crop_image.split(',')
+        if ':' not in args.crop_image or ',' not in args.crop_image or len(pairs) != 2:
+            print('{}: error: the following argument --crop-image requires to follow X:Y,W:H format'.format(__file__))
+            sys.exit(1)
+
+        coordinate, size = [pair.split(':') for pair in pairs]
+        crop_rect = {
+            'x': coordinate[0],
+            'y': coordinate[1],
+            'w': size[0],
+            'h': size[1]
+        }
+    else:
+        crop_rect = None
 
     filterable_csv_file = args.filterable_csv_file
     filterable_dataset_type = args.filterable_dataset_type
@@ -72,12 +90,17 @@ def parse_arguments():
               ' arguments must be existed at the same time.')
         sys.exit(1)
 
-    return args.dcm_dir, args.label_dir, args.target_dir, args.mode, int(args.jobs), new_shape, filterable_csv_file, filterable_dataset_type
+    return args.dcm_dir, args.label_dir, args.target_dir, \
+           args.mode, int(args.jobs), \
+           new_shape, crop_rect, filterable_csv_file, filterable_dataset_type
 
 
 def main():
     print()
-    dcm_dirpath, label_dirpath, target_dirpath, mode_name, jobs, new_shape, filterable_csv_file, filterable_dataset_type = parse_arguments()
+    dcm_dirpath, label_dirpath, target_dirpath, \
+    mode_name, jobs, \
+    new_shape, crop_rect, filterable_csv_file, filterable_dataset_type = parse_arguments()
+
     mode_type = modes[mode_name]
     if mode_type is None:
         print('Unrecognizable mode argument: {}'.format(mode_name))
@@ -85,6 +108,12 @@ def main():
 
     pipes = []
     filters = []
+
+    # Cropping have lower priority than resizing
+    if crop_rect is not None:
+        pipe = Crop(**crop_rect)
+        pipes.append(pipe)
+
     if new_shape is not None:
         pipe = Resize((int(new_shape[1]), int(new_shape[0])))  # WxH -> HxW
         pipes.append(pipe)

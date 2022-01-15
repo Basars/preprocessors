@@ -13,7 +13,7 @@ class ROI(Mode):
     def run(self, dst_dir, filename, dcm_filepath, label_filepath):
         dst_filepath = os.path.join(dst_dir, '{}.png'.format(filename))
 
-        dcm_image, mask, _, _ = create_segment_mask(dcm_filepath, label_filepath, remove_noise_intersection=True)
-        image = cv2.bitwise_and(dcm_image, mask)
+        _, mask, _, noise_eliminated = create_segment_mask(dcm_filepath, label_filepath, remove_noise_intersection=True)
+        image = cv2.bitwise_and(noise_eliminated, mask)
         image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
         return self.pipelines(dst_filepath, image)
