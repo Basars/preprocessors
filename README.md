@@ -97,3 +97,21 @@ John,James,Alice
 ,00000006,
 ```
 Proper assignees CSV file is required to separate the dataset fairly.
+```
+Result:
+- John
+    - 00000001
+        - *.jpg
+    - 00000004
+        - *.jpg
+- James
+    - 00000002
+        - *.jpg
+    - 00000005
+        - *.jpg
+    - 00000006
+        - *.jpg
+- Alice
+    - 00000003
+        - *.jpg
+```
