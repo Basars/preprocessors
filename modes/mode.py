@@ -93,13 +93,15 @@ class Mode:
             with open(json_filepath, 'r', encoding='euc-kr') as f:
                 label_json = json.load(f)
 
+            has_issue = False
             for f in self._filters:
                 error = f.apply(filename, json_filepath, label_json)
                 if error is not None:
                     errors.append(error)
+                    has_issue = True
                     break
 
-            if len(errors) > 0:
+            if has_issue:
                 continue
 
             error = self.run(dst_dir, filename, dcm_filepath, json_filepath)
