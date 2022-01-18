@@ -15,6 +15,7 @@ usage: main.py [-h] --dcm-dir DCM_DIR
                     --mode {inspector,mask,roi,spreadsheet}
                     [--filterable-csv-file FILTERABLE_CSV_FILE]
                     [--filterable-dataset-type {train,valid,test}]
+                    [--filterable-keep-issues]
                     [--new-shape NEW_SHAPE]
                     [--crop-image CROP_IMAGE]
                     [--jobs JOBS]
@@ -42,6 +43,8 @@ optional arguments:
                         The CSV file to be used for filtering broken datasets out
   --filterable-dataset-type {train,valid,test}
                         The type of dataset source directory for querying filterable CSV file
+  --filterable-keep-issues
+                        A flag to keep issued rows in filterable CSV file
   --new-shape NEW_SHAPE
                         WxH. Resize the output image with desired width and height - e.g.) 224x224
   --crop-image CROP_IMAGE

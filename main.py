@@ -48,6 +48,9 @@ def parse_arguments():
     parser.add_argument('--filterable-dataset-type',
                         choices=['train', 'valid', 'test'],
                         help='The type of dataset source directory for querying filterable CSV file')
+    parser.add_argument('--filterable-keep-issues',
+                        action='store_true',
+                        help='A flag to keep issued rows in filterable CSV file')
     parser.add_argument('--new-shape',
                         help='WxH. Resize the output image with desired width and height - e.g.) 224x224')
     parser.add_argument('--crop-image',
@@ -84,22 +87,28 @@ def parse_arguments():
 
     filterable_csv_file = args.filterable_csv_file
     filterable_dataset_type = args.filterable_dataset_type
+    filterable_keep_issues = args.filterable_keep_issues
     if (filterable_csv_file is not None and filterable_dataset_type is None) or \
        (filterable_csv_file is None and filterable_dataset_type is not None):
         print('{}: error: --filterable-csv-file and --filterable-dataset-type'
-              ' arguments must be existed at the same time.')
+              ' arguments must be existed at the same time.'.format(__file__))
+        sys.exit(1)
+    if filterable_keep_issues and (filterable_csv_file is None or filterable_dataset_type is None):
+        print('{}: error: --filterable-csv-file and --filterable-dataset-type'
+              ' arguments must be existed when --filterable_keep_issues exists.'.format(__file__))
         sys.exit(1)
 
     return args.dcm_dir, args.label_dir, args.target_dir, \
            args.mode, int(args.jobs), \
-           new_shape, crop_rect, filterable_csv_file, filterable_dataset_type
+           new_shape, crop_rect, filterable_csv_file, filterable_dataset_type, filterable_keep_issues
 
 
 def main():
     print()
     dcm_dirpath, label_dirpath, target_dirpath, \
     mode_name, jobs, \
-    new_shape, crop_rect, filterable_csv_file, filterable_dataset_type = parse_arguments()
+    new_shape, crop_rect, \
+    filterable_csv_file, filterable_dataset_type, filterable_keep_issues = parse_arguments()
 
     mode_type = modes[mode_name]
     if mode_type is None:
@@ -119,7 +128,7 @@ def main():
         pipes.append(pipe)
 
     if filterable_csv_file is not None and filterable_dataset_type is not None:
-        filters.append(FilterableFilter(filterable_csv_file, filterable_dataset_type))
+        filters.append(FilterableFilter(filterable_csv_file, filterable_dataset_type, filterable_keep_issues))
 
     for pipe in pipes:
         pipe.inform()

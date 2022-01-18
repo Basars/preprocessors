@@ -2,6 +2,7 @@ import json
 import os
 import cv2
 import time
+import shutil
 import multiprocessing
 import numpy as np
 
@@ -110,6 +111,8 @@ class Mode:
                 continue
 
             statistic.increase('success', 1)
+        if len(os.listdir(dst_dir)) == 0:
+            shutil.rmtree(dst_dir)
         return Statistic(statistic, *errors)
 
     def run_job(self, chunk: list):

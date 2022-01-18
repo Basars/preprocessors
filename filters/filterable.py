@@ -6,10 +6,11 @@ from .filter import Filter
 
 class FilterableFilter(Filter):
 
-    def __init__(self, csv_file, dataset_type):
+    def __init__(self, csv_file, dataset_type, remain_issues=True):
         super(FilterableFilter, self).__init__()
 
         self.dataset_type = dataset_type
+        self.remain_issues = remain_issues
 
         df = pd.read_csv(csv_file, header=None, dtype=str)
         df.columns = ['dataset_type', 'patient_id', 'image_id', 'assignee', 'issue']
@@ -23,6 +24,8 @@ class FilterableFilter(Filter):
 
         mask = (self.df['patient_id'] == patient_id) & (self.df['image_id'] == filename) & (self.df['issue'] == 'TRUE')
         row = self.df[mask]['issue']
-        if len(row) > 0:
-            return Statistic.from_key_value('dataset_filtered', 1)
+
+        filtered_stats = Statistic.from_key_value('dataset_filtered', 1)
+        if (self.remain_issues and len(row) == 0) or (not self.remain_issues and len(row) > 0):
+            return filtered_stats
         return None
