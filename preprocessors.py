@@ -5,20 +5,30 @@ import pydicom as dcm
 import numpy as np
 
 
-def create_segment_mask(dicom_filepath, label_filepath, remove_noise_intersection=False):
+def read_dcm_and_labels(dicom_filepath, label_filepath):
     dcm_file = dcm.dcmread(dicom_filepath)
     dcm_image = dcm_file.pixel_array
 
     with open(label_filepath, 'r', encoding='euc-kr') as f:
         label = json.load(f)
 
-    mask = np.zeros(dcm_image.shape, dtype=np.uint8)
     annotations = label['image']['annotations']
-    n_annotations = len(annotations)
+    polygons = []
+    for i in range(len(annotations)):
+        polygon = np.array(annotations[i]['polygon'], dtype=np.int32)
+        polygons.append(polygon)
+    phase = int(label['image']['phase_id'])
 
-    for i in range(n_annotations):
-        polygons = np.array(annotations[i]['polygon'], dtype=np.int32)
-        cv2.fillPoly(mask, [polygons], (255, 255, 255))
+    return dcm_image, polygons, phase
+
+
+def create_segment_mask(dicom_filepath, label_filepath, remove_noise_intersection=False):
+    dcm_image, polygons, _ = read_dcm_and_labels(dicom_filepath, label_filepath)
+
+    mask = np.zeros(dcm_image.shape, dtype=np.uint8)
+
+    for polygon in polygons:
+        cv2.fillPoly(mask, [polygon], (255, 255, 255))
 
     noise_eliminated, segmentation = remove_mask_noise_statically(dcm_image, mask)
     mask = segmentation  # override masks with translated segmentation
@@ -50,11 +60,16 @@ def remove_mask_noise(rgb_img, segmentation):
     return src_img, segmentation
 
 
-def remove_mask_noise_statically(rgb_img, segmentation):
+def static_translation_matrix():
     LEFT_PAD = 142
 
     M = np.array([[1, 0, (LEFT_PAD / 2 - 20) * -1],
                   [0, 1, 0]]).astype(np.float32)
+    return LEFT_PAD, M
+
+
+def remove_mask_noise_statically(rgb_img, segmentation):
+    LEFT_PAD, M = static_translation_matrix()
     img = rgb_img.copy()
     img[0:img.shape[1], 0:LEFT_PAD] = (0, 0, 0)
     img[0:50, 0:LEFT_PAD + 28] = (0, 0, 0)
@@ -63,3 +78,8 @@ def remove_mask_noise_statically(rgb_img, segmentation):
     img = cv2.warpAffine(img, M, (width, height))
     segmentation = cv2.warpAffine(segmentation, M, (width, height))
     return img, segmentation
+
+
+def translate_polygons_statically(polygons):
+    _, M = static_translation_matrix()
+    return cv2.transform(np.array([polygons]), M)

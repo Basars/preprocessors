@@ -40,7 +40,7 @@ class Mode:
     def finish(self):
         pass
 
-    def pipelines(self, target_filepath, image) -> Statistic or None:
+    def apply_pipelines(self, image) -> Statistic or np.ndarray:
         statistics = []
         for pipe in self._pipes:
             ret = pipe.apply(image)
@@ -54,7 +54,13 @@ class Mode:
                 break
         if len(statistics) > 0:
             return Statistic(*statistics)
-        cv2.imwrite(target_filepath, image)
+        return image
+
+    def pipelines(self, target_filepath, image) -> Statistic or None:
+        result = self.apply_pipelines(image)
+        if isinstance(result, Statistic):
+            return result
+        cv2.imwrite(target_filepath, result)
         return None
 
     def run(self, dst_dir, filename, dcm_filepath, label_filepath) -> Statistic or None:
@@ -111,7 +117,7 @@ class Mode:
                 continue
 
             statistic.increase('success', 1)
-        if len(os.listdir(dst_dir)) == 0:
+        if os.path.exists(dst_dir) and len(os.listdir(dst_dir)) == 0:
             shutil.rmtree(dst_dir)
         return Statistic(statistic, *errors)
 
