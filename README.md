@@ -12,7 +12,7 @@ pip install opencv-python pydicom matplotlib pandas
 usage: main.py [-h] --dcm-dir DCM_DIR 
                     --label-dir LABEL_DIR
                     --target-dir TARGET_DIR
-                    --mode {inspector,mask,roi,spreadsheet}
+                    --mode {inspector,mask,roi,spreadsheet,cvat}
                     [--filterable-csv-file FILTERABLE_CSV_FILE]
                     [--filterable-dataset-type {train,valid,test}]
                     [--filterable-keep-issues]
@@ -30,7 +30,7 @@ optional arguments:
                         The JSON labels root directory
   --target-dir TARGET_DIR
                         The destination root directory for outputs
-  --mode {inspector,mask,roi,spreadsheet}
+  --mode {inspector,mask,roi,spreadsheet,cvat}
                         inspector    Generate four-in-one images to compare masks, overlay 
                                      and noise-eliminated with original image
                         mask         Generate binary masks that will be used as Dataset
@@ -39,6 +39,8 @@ optional arguments:
                                      as Dataset for classification model
                         spreadsheet  Generate CSV files that contains encrypted
                                      patients identifiers and its file name
+                        cvat         Generate a XML file that contains segmentation mask polygons
+                                     to be uploaded on CVAT
   --filterable-csv-file FILTERABLE_CSV_FILE
                         The CSV file to be used for filtering broken datasets out
   --filterable-dataset-type {train,valid,test}
