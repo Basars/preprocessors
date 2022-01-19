@@ -16,7 +16,10 @@ class Classify(Mode):
         self._make_patient_dir = False
 
     def run(self, dst_dir, filename, dcm_filepath, label_filepath) -> Statistic or None:
-        _, _, phase = read_dcm_and_labels(dcm_filepath, label_filepath)
+        _, polygons, phase = read_dcm_and_labels(dcm_filepath, label_filepath)
+        if len(polygons) == 0:
+            return Statistic.from_key_value('no_polygons', 1)
+
         image = ROI.extract_region_of_interest(dcm_filepath, label_filepath)
 
         dst_dir = os.path.join(self.root_dst_dir, str(phase))
