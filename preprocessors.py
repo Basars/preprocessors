@@ -60,10 +60,14 @@ def remove_mask_noise(rgb_img, segmentation):
     return src_img, segmentation
 
 
-def static_translation_matrix():
+def static_translation_matrix(reverse=False):
     LEFT_PAD = 142
 
-    M = np.array([[1, 0, (LEFT_PAD / 2 - 20) * -1],
+    offset = (LEFT_PAD / 2 - 20) * -1
+    if reverse:
+        offset *= -1
+
+    M = np.array([[1, 0, offset],
                   [0, 1, 0]]).astype(np.float32)
     return LEFT_PAD, M
 
@@ -80,6 +84,6 @@ def remove_mask_noise_statically(rgb_img, segmentation):
     return img, segmentation
 
 
-def translate_polygons_statically(polygons):
-    _, M = static_translation_matrix()
+def translate_polygons_statically(polygons, reverse=False):
+    _, M = static_translation_matrix(reverse)
     return cv2.transform(np.array([polygons]), M)

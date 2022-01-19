@@ -1,18 +1,25 @@
 import argparse
 import sys
 import textwrap
+import overwriters
 
 from modes import Inspector, Mask, ROI, Spreadsheet, CVAT, Transform
 from pipes import Resize, Crop
 from filters import PhaseFilter, FilterableFilter
+from statistic import Statistic
 
-modes = {
+MODES = {
     'inspector': Inspector,
     'mask': Mask,
     'roi': ROI,
     'spreadsheet': Spreadsheet,
     'cvat': CVAT,
     'transform': Transform
+}
+
+
+OVERWRITERS = {
+    'cvat': overwriters.CVAT
 }
 
 
@@ -34,8 +41,8 @@ def parse_arguments():
                         help='The destination root directory for outputs')
     parser.add_argument('--mode',
                         required=True,
-                        choices=list(modes.keys()),
-                        default=list(modes.keys())[0],
+                        choices=list(MODES.keys()),
+                        default=list(MODES.keys())[0],
                         help=textwrap.dedent('''\
                         inspector    Generate four-in-one images to compare masks, overlay 
                                      and noise-eliminated with original image
@@ -56,6 +63,16 @@ def parse_arguments():
     parser.add_argument('--filterable-keep-issues',
                         action='store_true',
                         help='A flag to keep issued rows in filterable CSV file')
+    parser.add_argument('--overwrite-label-type',
+                        choices=['cvat'],
+                        help=textwrap.dedent('''\
+                        The type of overrideable labels format to parse
+                        
+                        cvat        CVAT 1.1 XML annotation format
+                                    Pass 'annotations.xml' file to --overwrite-label-file argument
+                        '''))
+    parser.add_argument('--overwrite-label-file',
+                        help='The label file to be used for overwriting dataset labels')
     parser.add_argument('--new-shape',
                         help='WxH. Resize the output image with desired width and height - e.g.) 224x224')
     parser.add_argument('--crop-image',
@@ -100,12 +117,21 @@ def parse_arguments():
         sys.exit(1)
     if filterable_keep_issues and (filterable_csv_file is None or filterable_dataset_type is None):
         print('{}: error: --filterable-csv-file and --filterable-dataset-type'
-              ' arguments must be existed when --filterable_keep_issues exists.'.format(__file__))
+              ' arguments must be existed when --filterable-keep-issues exists.'.format(__file__))
+        sys.exit(1)
+
+    overwrite_label_type = args.overwrite_label_type
+    overwrite_label_file = args.overwrite_label_file
+    if (overwrite_label_type is not None and overwrite_label_file is None) or \
+       (overwrite_label_type is None and overwrite_label_file is not None):
+        print('{}: error: --overwrite-label-type and --overwrite-label-file'
+              ' arguments must be existed at the same time.'.format(__file__))
         sys.exit(1)
 
     return args.dcm_dir, args.label_dir, args.target_dir, \
            args.mode, int(args.jobs), \
-           new_shape, crop_rect, filterable_csv_file, filterable_dataset_type, filterable_keep_issues
+           new_shape, crop_rect, filterable_csv_file, filterable_dataset_type, filterable_keep_issues, \
+           overwrite_label_type, overwrite_label_file
 
 
 def main():
@@ -113,12 +139,14 @@ def main():
     dcm_dirpath, label_dirpath, target_dirpath, \
     mode_name, jobs, \
     new_shape, crop_rect, \
-    filterable_csv_file, filterable_dataset_type, filterable_keep_issues = parse_arguments()
+    filterable_csv_file, filterable_dataset_type, filterable_keep_issues, \
+    overwrite_label_type, overwrite_label_file = parse_arguments()
 
-    mode_type = modes[mode_name]
-    if mode_type is None:
+    if mode_name not in MODES:
         print('Unrecognizable mode argument: {}'.format(mode_name))
         return
+
+    mode_type = MODES[mode_name]
 
     pipes = []
     filters = []
@@ -141,8 +169,29 @@ def main():
     # Filters
     filters.append(PhaseFilter())
 
-    mode = mode_type(dcm_dirpath, label_dirpath, target_dirpath, pipes, filters)
-    statistic = mode.parse_and_preprocess_dirs(jobs)
+    # Overwriters
+    overwriter = None
+    if overwrite_label_type is not None and overwrite_label_file is not None:
+        if overwrite_label_type not in OVERWRITERS:
+            print('Unrecognizable overwriter argument: {}'.format(overwrite_label_type))
+            return
+        overwriter = OVERWRITERS[overwrite_label_type]
+
+    if overwriter is not None:
+        overwriter = overwriter()
+        print('Current overwriter: {}'.format(overwriter.name))
+        overwritable_labels = overwriter.parse_labels(overwrite_label_file)
+    else:
+        overwritable_labels = None
+
+    if overwritable_labels is None or not isinstance(overwritable_labels, Statistic):
+        mode = mode_type(dcm_dirpath, label_dirpath, target_dirpath, pipes, filters)
+        if overwritable_labels is not None:
+            mode.set_overwritable_labels(overwritable_labels)
+        statistic = mode.parse_and_preprocess_dirs(jobs)
+    else:
+        statistic = overwritable_labels
+
     print("Job statistics:")
     for name, count in statistic.container.items():
         print('\t{}: {}'.format(name, count))

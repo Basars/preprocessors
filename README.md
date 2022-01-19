@@ -16,6 +16,8 @@ usage: main.py [-h] --dcm-dir DCM_DIR
                     [--filterable-csv-file FILTERABLE_CSV_FILE]
                     [--filterable-dataset-type {train,valid,test}]
                     [--filterable-keep-issues]
+                    [--overwrite-label-type {cvat}]
+                    [--overwrite-label-file OVERWRITE_LABEL_FILE]
                     [--new-shape NEW_SHAPE]
                     [--crop-image CROP_IMAGE]
                     [--jobs JOBS]
@@ -41,12 +43,20 @@ optional arguments:
                                      patients identifiers and its file name
                         cvat         Generate a XML file that contains segmentation mask polygons
                                      to be uploaded on CVAT
+                        transform    Generate the original dataset images but necessarily transformed
   --filterable-csv-file FILTERABLE_CSV_FILE
                         The CSV file to be used for filtering broken datasets out
   --filterable-dataset-type {train,valid,test}
                         The type of dataset source directory for querying filterable CSV file
   --filterable-keep-issues
                         A flag to keep issued rows in filterable CSV file
+  --overwrite-label-type {cvat}
+                        The type of overrideable labels format to parse
+                        
+                        cvat        CVAT 1.1 XML annotation format
+                                    Pass 'annotations.xml' file to --overwrite-label-file argument
+  --overwrite-label-file OVERWRITE_LABEL_FILE
+                        The label file to be used for overwriting dataset labels
   --new-shape NEW_SHAPE
                         WxH. Resize the output image with desired width and height - e.g.) 224x224
   --crop-image CROP_IMAGE

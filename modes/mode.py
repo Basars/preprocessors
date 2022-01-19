@@ -20,6 +20,8 @@ class Mode:
         self._pipes = pipes
         self._make_patient_dir = True
         self._filters = filters
+        self._overwritable_labels = None
+        self._overwritable_dir = '/tmp/preprocessors-overwritable'
 
     @property
     def name(self):
@@ -36,6 +38,20 @@ class Mode:
     @property
     def root_dst_dir(self):
         return self._root_dst_dir
+
+    @property
+    def overwritable_labels(self):
+        return self._overwritable_labels
+
+    @property
+    def overwritable_dir(self):
+        return self._overwritable_dir
+
+    def set_overwritable_labels(self, overwritable_labels):
+        self._overwritable_labels = overwritable_labels
+        if overwritable_labels is not None:
+            if not os.path.exists(self.overwritable_dir):
+                os.makedirs(self.overwritable_dir, exist_ok=True)
 
     def finish(self):
         pass
@@ -100,6 +116,21 @@ class Mode:
             with open(json_filepath, 'r', encoding='euc-kr') as f:
                 label_json = json.load(f)
 
+            overwritten = False
+            if self.overwritable_labels is not None and filename in self.overwritable_labels:
+                label = self.overwritable_labels[filename]
+
+                # overwrite json dicts
+                if 'phase_id' not in label['image']:
+                    label['image']['phase_id'] = label_json['image']['phase_id']
+                label_json = label
+                # overwrites the json file to tmp directory
+                json_filepath = os.path.join(self.overwritable_dir, '{}.json'.format(filename))
+                with open(json_filepath, 'w', encoding='euc-kr') as f:
+                    json.dump(label_json, f, indent=4, sort_keys=True)
+                overwritten = True
+                print('{} have been overwritten'.format(filename))
+
             has_issue = False
             for f in self._filters:
                 error = f.apply(filename, json_filepath, label_json)
@@ -116,7 +147,10 @@ class Mode:
                 errors.append(error)
                 continue
 
-            statistic.increase('success', 1)
+            if overwritten:
+                statistic.increase('overwritten', 1)
+            else:
+                statistic.increase('success', 1)
         if os.path.exists(dst_dir) and len(os.listdir(dst_dir)) == 0:
             shutil.rmtree(dst_dir)
         return Statistic(statistic, *errors)
