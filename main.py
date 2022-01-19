@@ -3,7 +3,7 @@ import sys
 import textwrap
 import overwriters
 
-from modes import Inspector, Mask, ROI, Spreadsheet, CVAT, Transform
+from modes import Inspector, Mask, ROI, Spreadsheet, CVAT, Transform, Classify
 from pipes import Resize, Crop
 from filters import PhaseFilter, FilterableFilter
 from statistic import Statistic
@@ -14,7 +14,8 @@ MODES = {
     'roi': ROI,
     'spreadsheet': Spreadsheet,
     'cvat': CVAT,
-    'transform': Transform
+    'transform': Transform,
+    'classify': Classify
 }
 
 
@@ -54,6 +55,8 @@ def parse_arguments():
                         cvat         Generate a XML file that contains segmentation mask polygons
                                      to be uploaded on CVAT
                         transform    Generate the original dataset images but necessarily transformed
+                        classify     Generate region-of-interest images that will be used
+                                     as Dataset for classification model, but sorts into phase labels
                         '''))
     parser.add_argument('--filterable-csv-file',
                         help='The CSV file to be used for filtering broken datasets out')

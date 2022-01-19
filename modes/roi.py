@@ -13,10 +13,15 @@ class ROI(Mode):
     def run(self, dst_dir, filename, dcm_filepath, label_filepath):
         dst_filepath = os.path.join(dst_dir, '{}.png'.format(filename))
 
+        image = ROI.extract_region_of_interest(dcm_filepath, label_filepath)
+        return self.pipelines(dst_filepath, image)
+
+    @staticmethod
+    def extract_region_of_interest(dcm_filepath, label_filepath):
         _, mask, _, noise_eliminated = create_segment_mask(dcm_filepath, label_filepath, remove_noise_intersection=True)
         kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (15, 15))
         mask = cv2.dilate(mask, kernel)
 
         image = cv2.bitwise_and(noise_eliminated, mask)
         image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
-        return self.pipelines(dst_filepath, image)
+        return image

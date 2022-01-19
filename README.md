@@ -12,7 +12,7 @@ pip install opencv-python pydicom matplotlib pandas
 usage: main.py [-h] --dcm-dir DCM_DIR 
                     --label-dir LABEL_DIR
                     --target-dir TARGET_DIR
-                    --mode {inspector,mask,roi,spreadsheet,cvat}
+                    --mode {inspector,mask,roi,spreadsheet,cvat,transform,classify}
                     [--filterable-csv-file FILTERABLE_CSV_FILE]
                     [--filterable-dataset-type {train,valid,test}]
                     [--filterable-keep-issues]
@@ -44,6 +44,8 @@ optional arguments:
                         cvat         Generate a XML file that contains segmentation mask polygons
                                      to be uploaded on CVAT
                         transform    Generate the original dataset images but necessarily transformed
+                        classify     Generate region-of-interest images that will be used
+                                     as Dataset for classification model, but sorts into phase labels
   --filterable-csv-file FILTERABLE_CSV_FILE
                         The CSV file to be used for filtering broken datasets out
   --filterable-dataset-type {train,valid,test}
