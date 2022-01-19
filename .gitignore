@@ -150,6 +150,7 @@ rois
 spreadsheets
 labels
 assigned
+transforms
 *.ipynb
 *.csv
 

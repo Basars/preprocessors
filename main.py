@@ -2,7 +2,7 @@ import argparse
 import sys
 import textwrap
 
-from modes import Inspector, Mask, ROI, Spreadsheet, CVAT
+from modes import Inspector, Mask, ROI, Spreadsheet, CVAT, Transform
 from pipes import Resize, Crop
 from filters import PhaseFilter, FilterableFilter
 
@@ -11,7 +11,8 @@ modes = {
     'mask': Mask,
     'roi': ROI,
     'spreadsheet': Spreadsheet,
-    'cvat': CVAT
+    'cvat': CVAT,
+    'transform': Transform
 }
 
 
@@ -45,6 +46,7 @@ def parse_arguments():
                                      patients identifiers and its file name
                         cvat         Generate a XML file that contains segmentation mask polygons
                                      to be uploaded on CVAT
+                        transform    Generate the original dataset images but necessarily transformed
                         '''))
     parser.add_argument('--filterable-csv-file',
                         help='The CSV file to be used for filtering broken datasets out')
