@@ -3,7 +3,7 @@ import sys
 import textwrap
 import overwriters
 
-from modes import Inspector, Mask, ROI, Spreadsheet, CVAT, Transform, Classify
+from modes import Inspector, Mask, ROI, Spreadsheet, CVAT, Transform, Classify, Label
 from pipes import Resize, Crop
 from filters import PhaseFilter, FilterableFilter
 from statistic import Statistic
@@ -15,7 +15,8 @@ MODES = {
     'spreadsheet': Spreadsheet,
     'cvat': CVAT,
     'transform': Transform,
-    'classify': Classify
+    'classify': Classify,
+    'label': Label
 }
 
 
@@ -57,6 +58,7 @@ def parse_arguments():
                         transform    Generate the original dataset images but necessarily transformed
                         classify     Generate region-of-interest images that will be used
                                      as Dataset for classification model, but sorts into phase labels
+                        label        Generate a CSV file that contains file name and its cancer phases
                         '''))
     parser.add_argument('--filterable-csv-file',
                         help='The CSV file to be used for filtering broken datasets out')

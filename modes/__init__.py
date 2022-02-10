@@ -5,3 +5,4 @@ from .spreadsheet import Spreadsheet
 from .cvat import CVAT
 from .transform import Transform
 from .classify import Classify
+from .label import Label
